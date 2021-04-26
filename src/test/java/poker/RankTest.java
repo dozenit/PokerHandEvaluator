@@ -9,6 +9,6 @@ public class RankTest {
 
     @Test
     void shouldHaveThirteenValues() {
-        Assertions.assertEquals(POKER_RANKS_COUNT, Ranks.values().length);
+        Assertions.assertEquals(POKER_RANKS_COUNT, Rank.values().length);
     }
 }
