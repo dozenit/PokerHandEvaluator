@@ -20,12 +20,9 @@ public class HandTest {
     Set<Card> fourCards = new HashSet<>(Set.of(card1, card2, card3, card4));
     Set<Card> fiveCards = new HashSet<>(Set.of(card1, card2, card3, card4, card5));
 
-    Hand handWithFourCards = new Hand(fourCards);
-    Hand handWithFiveCards = new Hand(fiveCards);
-
     @Test
     void givenHandShouldContainFiveCards() {
-        assertEquals(HAND_SIZE, handWithFiveCards.getCards().size());
-        assertNotEquals(HAND_SIZE, handWithFourCards.getCards().size());
+        assertDoesNotThrow(() -> new Hand(fiveCards));
+        assertThrows(IllegalArgumentException.class, () -> new Hand(fourCards));
     }
 }
