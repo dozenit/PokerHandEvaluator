@@ -7,15 +7,15 @@ public class CardTest {
 
     @Test
     void givenCardShouldHaveASuit() {
-        Card card = new Card(Rank.TWO,
+        Card card = new Card(Value.TWO,
                 Suit.CLUBS);
         Assertions.assertTrue(card.getSuit() instanceof Suit);
     }
 
     @Test
     void givenCardShouldHaveARank() {
-        Card card = new Card(Rank.TWO,
+        Card card = new Card(Value.TWO,
                 Suit.CLUBS);
-        Assertions.assertTrue(card.getSuit() instanceof Suit);
+        Assertions.assertTrue(card.getValue() instanceof Value);
     }
 }

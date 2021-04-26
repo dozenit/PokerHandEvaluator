@@ -9,7 +9,7 @@ public class SuitTest {
     static final int POKER_SUITS_COUNT = 4;
 
     @Test
-    void shouldHaveFourValues() {
+    void shouldHaveFourEntries() {
         Assertions.assertEquals(POKER_SUITS_COUNT,
                 Suit.values().length);
     }

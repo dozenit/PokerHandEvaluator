@@ -1,6 +1,6 @@
 package poker;
 
-public enum Rank {
+public enum Value {
     TWO,
     THREE,
     FOUR,

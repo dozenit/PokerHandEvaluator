@@ -15,7 +15,6 @@ public class Hand {
                     "Hand must be given exactly 5 cards. The amount of cards given were: " + cardsAmount);
         }
         this.cards = new HashSet<>(cards);
-
     }
 
     public Collection<Card> getCards() {
