@@ -1,5 +1,7 @@
 package poker;
 
+import java.util.EnumSet;
+
 public class Card {
     private final Rank rank;
     private final Suit suit;
