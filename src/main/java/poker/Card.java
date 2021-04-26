@@ -20,19 +20,6 @@ public class Card implements Comparable<Card>{
 
     @Override
     public int compareTo(Card that) {
-        final int HIGHER = 1;
-        final int EQUAL = 0;
-        final int LOWER = -1;
-
-        int thisValue = this.value.ordinal();
-        int thatValue = that.getValue().ordinal();
-
-        if ( thisValue > thatValue) {
-            return HIGHER;
-        } else if (thisValue == thatValue) {
-            return EQUAL;
-        } else {
-            return LOWER;
-        }
+        return Integer.compare(this.value.ordinal(), that.getValue().ordinal());
     }
 }
