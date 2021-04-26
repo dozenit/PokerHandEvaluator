@@ -1,19 +1,17 @@
 package poker;
 
-import java.util.EnumSet;
-
 public class Card {
-    private final Rank rank;
+    private final Value value;
     private final Suit suit;
 
-    public Card(Rank rank,
+    public Card(Value value,
                 Suit suit) {
-        this.rank = rank;
+        this.value = value;
         this.suit = suit;
     }
 
-    public Rank getRank() {
-        return rank;
+    public Value getValue() {
+        return value;
     }
 
     public Suit getSuit() {

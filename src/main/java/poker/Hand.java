@@ -12,10 +12,9 @@ public class Hand {
         int cardsAmount = cards.size();
         if (cardsAmount != HAND_SIZE) {
             throw new IllegalArgumentException(
-                    "Hand must be given exactly 5 cards. The amount of cards given were: %d.".formatted(cardsAmount));
+                    "Hand must be given exactly 5 cards. The amount of cards given were: " + cardsAmount);
         }
         this.cards = new HashSet<>(cards);
-
     }
 
     public Collection<Card> getCards() {

@@ -3,12 +3,12 @@ package poker;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-public class RankTest {
+public class ValueTest {
 
     static final int POKER_RANKS_COUNT = 13;
 
     @Test
-    void shouldHaveThirteenValues() {
-        Assertions.assertEquals(POKER_RANKS_COUNT, Rank.values().length);
+    void shouldHaveThirteenEntries() {
+        Assertions.assertEquals(POKER_RANKS_COUNT, Value.values().length);
     }
 }
