@@ -1,12 +1,13 @@
 package poker;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
-import java.util.HashSet;
-import java.util.Set;
-
+@DisplayName("Rank evaluation and string checks.")
 public class RankEvaluationTest {
+
+    public static final String WHEN_GIVEN_HAND_RANKS_AT_CATEGORY = "When given hand ranks at category ";
+    public static final String OUTPUT_SHOULD_RANK_THE_HAND_AS = "Output should rank the hand as ";
+
     Card twoOfClubs = new Card(Value.TWO, Suit.CLUBS);
     Card threeOfClubs = new Card(Value.THREE, Suit.CLUBS);
     Card fourOfClubs = new Card(Value.FOUR, Suit.CLUBS);
@@ -21,17 +22,50 @@ public class RankEvaluationTest {
     Hand handThatRanksAtHighCardWithTen = new Hand(tenOfDiamonds, threeOfClubs, fourOfClubs, fiveOfClubs, sixOfClubs);
 
     Hand handThatRanksAtPairWithTwo = new Hand(twoOfClubs, twoOfDiamonds, fourOfClubs, fiveOfClubs, sixOfClubs);
-    Hand handThatRanksAtPairWithThree = new Hand(tenOfDiamonds, fourOfDiamonds, fourOfClubs, fiveOfClubs, sixOfClubs);
+    Hand handThatRanksAtPairWithFour = new Hand(tenOfDiamonds, fourOfDiamonds, fourOfClubs, fiveOfClubs, sixOfClubs);
 
-    @Test
-    void Should_OutputRankWithCategoryAndKicker_WhenGivenHandRankIsHighCard() {
-        RankEvaluation evaluation = new RankEvaluation(handThatRanksAtHighCardWithSix);
-        String outputForHighCardOfSix = "Player's hand reached category HIGH_CARD with the high card SIX.";
-        Assertions.assertEquals(outputForHighCardOfSix, evaluation.toString());
+    @Nested
+    @DisplayName(WHEN_GIVEN_HAND_RANKS_AT_CATEGORY + "\"High Card\"")
+    class WhenGivenHandRanksAsHighCard {
 
-        RankEvaluation evaluation2 = new RankEvaluation(handThatRanksAtHighCardWithTen);
-        String outputForHighCardOfTen = "Player's hand reached category HIGH_CARD with the high card TEN.";
-        Assertions.assertEquals(outputForHighCardOfTen, evaluation2.toString());
+        @Test
+        @DisplayName(OUTPUT_SHOULD_RANK_THE_HAND_AS + "high card, with high card of six.")
+        void Should_OutputRankWithHighCardSix() {
+            assertHighCard(handThatRanksAtHighCardWithSix, Value.SIX);
+        }
+
+        @Test
+        @DisplayName(OUTPUT_SHOULD_RANK_THE_HAND_AS + "high card, with high card of ten.")
+        void Should_OutputRankWithHighCardTen() {
+            assertHighCard(handThatRanksAtHighCardWithTen, Value.TEN);
+        }
+
+        private void assertHighCard(Hand handThatRanksAtHighCardWithValue, Value value) {
+            RankEvaluation evaluation = new RankEvaluation(handThatRanksAtHighCardWithValue);
+            String expectedOutput = "Player's hand reached category HIGH_CARD " +
+                    "with the high card " + value + ".";
+            Assertions.assertEquals(expectedOutput, evaluation.toString());
+        }
+    }
+
+    @Nested
+    @DisplayName(WHEN_GIVEN_HAND_RANKS_AT_CATEGORY + "\"Pair\"")
+    class WhenGivenHandRanksAsPair {
+        @Test
+        void Should_OutputRankWithPairOfTwo() {
+            assertPair(handThatRanksAtPairWithTwo, Value.TWO);
+        }
+        @Test
+        void Should_OutputRankWithPairOfTen() {
+            assertPair(handThatRanksAtPairWithFour, Value.FOUR);
+        }
+
+        private void assertPair(Hand handThatRanksAtPairWithSix, Value value) {
+            RankEvaluation evaluation = new RankEvaluation(handThatRanksAtPairWithSix);
+            String expectedOutput = "Player's hand reached category PAIR " +
+                    "with a pair of " + value + ".";
+            Assertions.assertEquals(expectedOutput, evaluation.toString());
+        }
     }
 
     @Test
