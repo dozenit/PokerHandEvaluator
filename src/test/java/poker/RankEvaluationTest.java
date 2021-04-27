@@ -16,6 +16,7 @@ public class RankEvaluationTest {
 
     Card twoOfDiamonds = new Card(Value.TWO, Suit.DIAMONDS);
     Card fourOfDiamonds = new Card(Value.FOUR, Suit.DIAMONDS);
+    Card fiveOfDiamonds = new Card(Value.FIVE, Suit.DIAMONDS);
     Card tenOfDiamonds = new Card(Value.TEN, Suit.DIAMONDS);
 
     Card tenOfSpades = new Card(Value.TEN, Suit.SPADES);
@@ -27,6 +28,8 @@ public class RankEvaluationTest {
     Hand handThatRanksAtPairWithFourAndKickerTen = new Hand(tenOfDiamonds, fourOfDiamonds, fourOfClubs, fiveOfClubs, sixOfClubs);
     Hand handThatRanksAtPairWithTenAndKickerSix = new Hand(tenOfDiamonds, tenOfSpades, fourOfClubs, fiveOfClubs, sixOfClubs);
     Hand handThatRanksAtPairWithTenAndKickerJack = new Hand(tenOfDiamonds, tenOfSpades, jackOfSpades, fiveOfClubs, sixOfClubs);
+
+    Hand handThatRanksAtTwoPairWithTenHighAndFiveLowAndKickerSix = new Hand(tenOfDiamonds, tenOfSpades, fiveOfDiamonds, fiveOfClubs, sixOfClubs);
 
     @Nested
     @DisplayName(WHEN_GIVEN_HAND_RANKS_AT_CATEGORY + "\"High Card\"")
@@ -50,15 +53,13 @@ public class RankEvaluationTest {
             final Category expectedCategory = Category.HIGH_CARD;
             String expectedOutput = RankEvaluation.HAND_HAS_REACHED + expectedCategory.toString()
                     + RankEvaluation.WITH_HIGH_CARD + expectedValue + RankEvaluation.SENTENCE_END;
-            assertRank(Category.HIGH_CARD, expectedOutput, handThatRanksAtHighCardWithValue);
+            assertRank(expectedCategory, expectedOutput, handThatRanksAtHighCardWithValue);
         }
     }
 
     @Nested
     @DisplayName(WHEN_GIVEN_HAND_RANKS_AT_CATEGORY + "\"Pair\"")
     class WhenGivenHandRanksAsPair {
-        public static final String WITH_A_PAIR_OF = " with a pair of ";
-                public static final String AND_KICKER = " and the kicker ";
 
         @Test
         @DisplayName("Should output pair with kicker when kicker is greater than pair (Four with kicker Ten)")
@@ -78,18 +79,38 @@ public class RankEvaluationTest {
             assertPair(Value.TEN, Value.JACK, handThatRanksAtPairWithTenAndKickerJack);
         }
 
-        private void assertPair(Value expectedPair, Value expectedKicker, Hand handThatRanksAtPairWithValue) {
+        private void assertPair(Value expectedPair, Value expectedKicker, Hand handThatRanksAtPair) {
             final Category expectedCategory = Category.PAIR;
             String expectedOutput = RankEvaluation.HAND_HAS_REACHED + expectedCategory.toString()
-                    + RankEvaluation.WITH_PAIR + expectedPair
-                    + RankEvaluation.AND_KICKER + expectedKicker
+                    + RankEvaluation.WITH_A_PAIR_OF + expectedPair
+                    + RankEvaluation.AND_THE_KICKER + expectedKicker
                     + RankEvaluation.SENTENCE_END;
-            assertRank(Category.HIGH_CARD, expectedOutput, handThatRanksAtPairWithValue);
+            assertRank(expectedCategory, expectedOutput, handThatRanksAtPair);
         }
-
-
     }
 
+    @Nested
+    @DisplayName(WHEN_GIVEN_HAND_RANKS_AT_CATEGORY + "\"Two Pair\"")
+    class WhenGivenHandRanksAsTwoPair {
+
+        @Test
+        @DisplayName("Should output two pair and list the higher pair first")
+        void Should_OutputRankWithTwoPairAndListTheHigherPairFirst() {
+            assertTwoPair(Value.TEN, Value.FIVE, handThatRanksAtTwoPairWithTenHighAndFiveLowAndKickerSix);
+        }
+
+        // TODO: Add Kicker
+        private void assertTwoPair(Value expectedHighPair, Value expectedLowPair, Hand handThatRanksAtTwoPair) {
+            final Category expectedCategory = Category.TWO_PAIR;
+            String expectedOutput = RankEvaluation.HAND_HAS_REACHED + expectedCategory.toString()
+                    + RankEvaluation.WITH_A_HIGH_PAIR_OF + expectedHighPair
+                    + RankEvaluation.A_LOW_PAIR_OF + expectedLowPair
+                    + RankEvaluation.SENTENCE_END;
+            assertRank(expectedCategory, expectedOutput, handThatRanksAtTwoPair);
+        }
+    }
+
+    @DisplayName("Output should equal the string for the user that informs about the exact rank for a given hand")
     private void assertRank(Category expectedCategory, String expectedOutput, Hand hand) {
         RankEvaluation evaluation = new RankEvaluation(hand);
         Assertions.assertEquals(expectedOutput, evaluation.toString());
