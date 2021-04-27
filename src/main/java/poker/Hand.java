@@ -23,7 +23,7 @@ public class Hand {
         this.cards = new HashSet<>(Set.of(card1, card2, card3, card4, card5));
     }
 
-    public Collection<Card> getCards() {
+    public Set<Card> getCards() {
         return this.cards;
     }
 }
