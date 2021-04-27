@@ -7,15 +7,16 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class RankEvaluationTest {
-    Card card1 = new Card(Value.TWO, Suit.CLUBS);
-    Card card2 = new Card(Value.THREE, Suit.CLUBS);
-    Card card3 = new Card(Value.FOUR, Suit.CLUBS);
-    Card card4 = new Card(Value.FIVE, Suit.CLUBS);
-    Card card5 = new Card(Value.SIX, Suit.CLUBS);
-    Card card6 = new Card(Value.TEN, Suit.DIAMONDS);
+    Card twoOfClubs = new Card(Value.TWO, Suit.CLUBS);
+    Card threeOfClubs = new Card(Value.THREE, Suit.CLUBS);
+    Card fourOfClubs = new Card(Value.FOUR, Suit.CLUBS);
+    Card fiveOfClubs = new Card(Value.FIVE, Suit.CLUBS);
+    Card sixOfClubs = new Card(Value.SIX, Suit.CLUBS);
 
-    Hand handThatRanksAtHighCardWithSix = new Hand(new HashSet<>(Set.of(card1, card2, card3, card4, card5)));
-    Hand handThatRanksAtHighCardWithTen = new Hand(new HashSet<>(Set.of(card6, card2, card3, card4, card5)));
+    Card tenOfDiamonds = new Card(Value.TEN, Suit.DIAMONDS);
+
+    Hand handThatRanksAtHighCardWithSix = new Hand(twoOfClubs, threeOfClubs, fourOfClubs, fiveOfClubs, sixOfClubs);
+    Hand handThatRanksAtHighCardWithTen = new Hand(tenOfDiamonds, threeOfClubs, fourOfClubs, fiveOfClubs, sixOfClubs);
 
     @Test
     void Should_OutputRankWithCategoryAndKicker_WhenGivenHandRankIsHighCard() {

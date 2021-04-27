@@ -9,7 +9,6 @@ public class RankEvaluation {
         evaluateCategory(hand);
     }
 
-    // TODO (Milestone: Hand-Ranking Categories) implement evaluation for all categories
     private void evaluateCategory(Hand hand) {
         evaluateHighCard(hand);
     }
@@ -26,10 +25,9 @@ public class RankEvaluation {
         }
     }
 
-    // TODO (Milestone: Hand-Ranking Categories) change string for other categories.
     public String toString() {
         final String reachedRank = category.toString();
-        final String highCard = this.highCard.getValue().toString(); // + " of " + this.highCard.getSuit();
+        final String highCard = this.highCard.getValue().toString();
 
         return "Player's hand reached category " + reachedRank + " with high card " + highCard + ".";
     }
