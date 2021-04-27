@@ -1,9 +1,28 @@
 package poker;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class RankEvaluation {
+
+    private Category category;
+
+    private Map<Value, Integer> valueHistogram;
+
+    private Set<Value> singles;
+    private Set<Value> pairs;
+
+    private Value highCard;
+
+    private Value pair;
+
+    private Value kicker;
+
+    private Value highPair;
+    private Value lowPair;
+
+    //================================================================================
+    // Static Strings for Output to User
+    //================================================================================
 
     public static final String HAND_HAS_REACHED = "Player's hand reached category ";
 
@@ -17,88 +36,58 @@ public class RankEvaluation {
 
     public static final String SENTENCE_END = ".";
 
-    private Category category;
-
-    private Value highCard;
-
-    private Value pair;
-
-    private Value kicker;
-
-    private Value highPair;
-    private Value lowPair;
-
-
-    public RankEvaluation(Hand hand) {
-        evaluateCategory(hand);
-    }
-
-    private void evaluateCategory(Hand hand) {
-        evaluateHighCard(hand);
-        if (evaluatePair(hand) == Category.PAIR) {
-            evaluateTwoPair(hand);
-        }
-    }
-
     //================================================================================
     // Methods for Rank Evaluation, sorted by Poker Ranking Category
     //================================================================================
 
+    public RankEvaluation(Hand hand) {
+        defineValueHistogram(hand);
+        defineSinglesAndPairs(valueHistogram);
+        evaluateCategoriesWithMultipleCardsOfOneValue(hand);
+    }
+
+    private void evaluateCategoriesWithMultipleCardsOfOneValue(Hand hand) {
+        if (singles.size() == 5) {
+            evaluateHighCard(hand);
+        } else if (pairs.size() == 1) {
+            evaluatePair(hand);
+        } else if (pairs.size() == 2) {
+            evaluateTwoPair(hand);
+        }
+    }
+
+    // precondition: `singles` has been set
     private void evaluateHighCard(Hand hand) {
         category = Category.HIGH_CARD;
-        highCard = getHighestValueAmongCards(hand.getCards());
+        highCard = getHighestValue(singles);
     }
 
-    private Category evaluatePair(Hand hand) {
-        Set<Value> pairCandidates = new HashSet<>();
-        Set<Value> kickerCandidates = new HashSet<>();
+    // precondition: `pairs` has been set
+    private void evaluatePair(Hand hand) {
+        category = Category.PAIR;
+        kicker = getHighestValue(singles);
 
-        for (Card card : hand.getCards()) {
-            Value value = card.getValue();
-            if (!pairCandidates.contains(value)) {
-                pairCandidates.add(value);
-            } else {
-                pair = value;
-                kickerCandidates.addAll(pairCandidates);
-                kickerCandidates.remove(value);
-                evaluateKickerForPair(kickerCandidates);
-                category = Category.PAIR;
-            }
+        for (Value thePair : pairs) {
+            pair = thePair;
         }
-        return category;
     }
 
-    private Category evaluateTwoPair(Hand hand) {
-        Set<Value> secondPairCandidates = new HashSet<>();
-        Set<Value> kickerCandidates = new HashSet<>();
+    // precondition: `pairs` has been set
+    private void evaluateTwoPair(Hand hand) {
+        category = Category.TWO_PAIR;
+        kicker = getHighestValue(singles);
 
-        for (Card card : hand.getCards()) {
-            Value value = card.getValue();
-            if (value == pair) {
+        for (Value current : pairs) {
+            if (highPair == null) {
+                highPair = current;
                 continue;
             }
-            if (!secondPairCandidates.contains(value)) {
-                secondPairCandidates.add(value);
+            if (current.compareTo(highPair) < 0) {
+                lowPair = current;
             } else {
-                setHighPairAndLowPair(value);
-                kickerCandidates.addAll(secondPairCandidates);
-                kickerCandidates.remove(lowPair);
-                kickerCandidates.remove(highPair);
-                evaluateKickerForPair(kickerCandidates);
-                category = Category.TWO_PAIR;
+                lowPair = highPair;
+                highPair = current;
             }
-        }
-        return category;
-    }
-
-    // Precondition: `pair` has previously been set.
-    private void setHighPairAndLowPair(Value value) {
-        if (value.compareTo(pair) < 0) {
-            lowPair = value;
-            highPair = pair;
-        } else {
-            lowPair = pair;
-            highPair = value;
         }
     }
 
@@ -106,16 +95,53 @@ public class RankEvaluation {
     // Helper Methods for Rank Evaluation
     //================================================================================
 
-    private Value getHighestValueAmongCards(Set<Card> cards) {
-        return getHighestAmongValues(getValuesFromCards(cards));
+    public void defineValueHistogram(Hand hand) {
+        valueHistogram = new HashMap<>();
+        int multiplicity;
+        for (Card card: hand.getCards()) {
+            Value value = card.getValue();
+            if (!valueHistogram.containsKey(value)) {
+                valueHistogram.put(value, 1);
+            }
+            else {
+                multiplicity = valueHistogram.get(value) + 1;
+                valueHistogram.replace(value, multiplicity);
+            }
+        }
     }
 
-    private Value getHighestAmongValues(Set<Value> values) {
+    public void defineSinglesAndPairs(Map<Value, Integer> histogram) {
+        singles = new HashSet<>();
+        pairs = new HashSet<>();
+        for (Map.Entry<Value, Integer> entry : histogram.entrySet()) {
+            int valueMultiplicity = entry.getValue();
+            Value value = entry.getKey();
+
+            // TODO: Remove
+            String tempInfo = "The Value " + value + " appeared " + valueMultiplicity
+                    + " times and was added to ";
+
+            switch (valueMultiplicity) {
+                case 1 -> {
+                    singles.add(value);
+                    tempInfo += "the singles.";
+                }
+                case 2 -> {
+                    pairs.add(value);
+                    tempInfo += "the pairs.";
+                }
+            }
+            System.out.println(tempInfo);
+        }
+    }
+
+    private Value getHighestValue(Set<Value> values) {
         if (values.size() < 1) {
             throw new IllegalArgumentException(
                     "Cannot calculate a value if no items are given."
                             + "The given set must at least include one item.");
         }
+
         Value highest = Value.TWO;
         for (Value current : values) {
             if (highest.compareTo(current) < 0) {
@@ -133,15 +159,6 @@ public class RankEvaluation {
         return values;
     }
 
-    private void evaluateKickerForPair(Set<Value> values) {
-        // asserts `highCard` has been set to highest value among cards.
-        if (highCard.compareTo(pair) == 0) {
-            kicker = getHighestAmongValues(values);
-        } else {
-            kicker = highCard;
-        }
-    }
-
     //================================================================================
     // Output Method for Player and Tests
     //================================================================================
@@ -152,9 +169,10 @@ public class RankEvaluation {
         switch (this.category) {
             case HIGH_CARD -> rankInformation += WITH_HIGH_CARD + highCard;
             case PAIR -> rankInformation += WITH_A_PAIR_OF + pair + AND_THE_KICKER + kicker;
-            case TWO_PAIR -> rankInformation += WITH_A_HIGH_PAIR_OF + highPair + A_LOW_PAIR_OF + lowPair;
+            case TWO_PAIR -> rankInformation += WITH_A_HIGH_PAIR_OF + highPair + A_LOW_PAIR_OF + lowPair
+                    + AND_THE_KICKER + kicker;
             default -> throw new IllegalArgumentException("Unable to determine category for given hand." +
-                    "This method should not be called before `evaluateCategory()` has initialized class attributes.");
+                    "This method should not be called before `evaluateCategoriesWithMultipleCardsOfOneValue()` has initialized class attributes.");
         }
         return rankInformation + SENTENCE_END;
     }
