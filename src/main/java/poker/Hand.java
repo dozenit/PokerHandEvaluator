@@ -23,18 +23,6 @@ public class Hand {
         this.cards = new HashSet<>(Set.of(card1, card2, card3, card4, card5));
     }
 
-    public Hand(final Value value1, final Suit suit1,
-                final Value value2, final Suit suit2,
-                final Value value3, final Suit suit3,
-                final Value value4, final Suit suit4,
-                final Value value5, final Suit suit5) {
-        this(new Card(value1, suit1),
-                            new Card(value2, suit2),
-                            new Card(value3, suit3),
-                            new Card(value4, suit4),
-                            new Card(value5, suit5));
-    }
-
     public Collection<Card> getCards() {
         return this.cards;
     }
