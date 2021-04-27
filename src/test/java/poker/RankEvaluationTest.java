@@ -31,20 +31,20 @@ public class RankEvaluationTest {
         @Test
         @DisplayName(OUTPUT_SHOULD_RANK_THE_HAND_AS + "high card, with high card of six.")
         void Should_OutputRankWithHighCardSix() {
-            assertHighCard(handThatRanksAtHighCardWithSix, Value.SIX);
+            assertHighCard(Value.SIX, handThatRanksAtHighCardWithSix);
         }
 
         @Test
         @DisplayName(OUTPUT_SHOULD_RANK_THE_HAND_AS + "high card, with high card of ten.")
         void Should_OutputRankWithHighCardTen() {
-            assertHighCard(handThatRanksAtHighCardWithTen, Value.TEN);
+            assertHighCard(Value.TEN, handThatRanksAtHighCardWithTen);
         }
 
-        private void assertHighCard(Hand handThatRanksAtHighCardWithValue, Value value) {
-            RankEvaluation evaluation = new RankEvaluation(handThatRanksAtHighCardWithValue);
-            String expectedOutput = "Player's hand reached category HIGH_CARD " +
-                    "with the high card " + value + ".";
-            Assertions.assertEquals(expectedOutput, evaluation.toString());
+        private void assertHighCard(Value expectedValue, Hand handThatRanksAtHighCardWithValue) {
+            final Category expectedCategory = Category.HIGH_CARD;
+            String expectedOutput = RankEvaluation.HAND_HAS_REACHED + expectedCategory.toString()
+                    + RankEvaluation.WITH_HIGH_CARD + expectedValue + RankEvaluation.SENTENCE_END;
+            assertRank(Category.HIGH_CARD, expectedOutput, handThatRanksAtHighCardWithValue);
         }
     }
 
@@ -53,26 +53,23 @@ public class RankEvaluationTest {
     class WhenGivenHandRanksAsPair {
         @Test
         void Should_OutputRankWithPairOfTwo() {
-            assertPair(handThatRanksAtPairWithTwo, Value.TWO);
+            assertPair(Value.TWO, handThatRanksAtPairWithTwo);
         }
         @Test
         void Should_OutputRankWithPairOfTen() {
-            assertPair(handThatRanksAtPairWithFour, Value.FOUR);
+            assertPair(Value.FOUR, handThatRanksAtPairWithFour);
         }
 
-        private void assertPair(Hand handThatRanksAtPairWithSix, Value value) {
-            RankEvaluation evaluation = new RankEvaluation(handThatRanksAtPairWithSix);
-            String expectedOutput = "Player's hand reached category PAIR " +
-                    "with a pair of " + value + ".";
-            Assertions.assertEquals(expectedOutput, evaluation.toString());
+        private void assertPair(Value expectedValue, Hand handThatRanksAtPairWithValue) {
+            final Category expectedCategory = Category.PAIR;
+            String expectedOutput = RankEvaluation.HAND_HAS_REACHED + expectedCategory.toString()
+                    + RankEvaluation.WITH_PAIR + expectedValue + RankEvaluation.SENTENCE_END;
+            assertRank(Category.HIGH_CARD, expectedOutput, handThatRanksAtPairWithValue);
         }
     }
 
-    @Test
-    void Should_OutputRankWithCategoryAndKicker_WhenGivenHandRankIsPair() {
-        RankEvaluation evaluation = new RankEvaluation(handThatRanksAtPairWithTwo);
-        String outputForPairOfTwo = "Player's hand reached category PAIR with a pair of TWO.";
-        Assertions.assertEquals(outputForPairOfTwo, evaluation.toString());
-
+    private void assertRank(Category expectedCategory, String expectedOutput, Hand hand) {
+        RankEvaluation evaluation = new RankEvaluation(hand);
+        Assertions.assertEquals(expectedOutput, evaluation.toString());
     }
 }
