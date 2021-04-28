@@ -16,6 +16,7 @@ public class RankEvaluationTest {
 
     Card fourOfDiamonds = new Card(Value.FOUR, Suit.DIAMONDS);
     Card fiveOfDiamonds = new Card(Value.FIVE, Suit.DIAMONDS);
+    Card sixOfDiamonds = new Card(Value.SIX, Suit.DIAMONDS);
     Card tenOfDiamonds = new Card(Value.TEN, Suit.DIAMONDS);
 
     Card fourOfSpades = new Card(Value.FOUR, Suit.SPADES);
@@ -23,6 +24,7 @@ public class RankEvaluationTest {
     Card jackOfSpades = new Card(Value.JACK, Suit.SPADES);
 
     Card fourOfHearts = new Card(Value.FOUR, Suit.HEARTS);
+    Card sixOfHearts = new Card(Value.SIX, Suit.HEARTS);
     Card tenOfHearts = new Card(Value.TEN, Suit.HEARTS);
 
     @Nested
@@ -48,7 +50,7 @@ public class RankEvaluationTest {
         private void assertHighCard(Value expectedValue, Hand handThatRanksAtHighCardWithValue) {
             final Category expectedCategory = Category.HIGH_CARD;
             String expectedOutput = RankEvaluation.HAND_HAS_REACHED + expectedCategory.toString()
-                    + RankEvaluation.WITH_HIGH_CARD + expectedValue + RankEvaluation.SENTENCE_END;
+                    + RankEvaluation.WITH_THE_HIGH_CARD + expectedValue + RankEvaluation.SENTENCE_END;
             assertRank(expectedCategory, expectedOutput, handThatRanksAtHighCardWithValue);
         }
     }
@@ -149,7 +151,7 @@ public class RankEvaluationTest {
     }
 
     @Nested
-    @DisplayName(WHEN_GIVEN_HAND_RANKS_AT_CATEGORY + "\"Three of a Kind\"")
+    @DisplayName(WHEN_GIVEN_HAND_RANKS_AT_CATEGORY + "\"Four of a Kind\"")
     class WhenGivenHandRanksAsFourOfAKind {
 
         @Test
@@ -170,12 +172,44 @@ public class RankEvaluationTest {
                     handThatRanksAtFourOfAKindWithFour);
         }
 
-        private void assertFourOfAKind(Value expectedFourOfAKind, Hand handThatRanksAtThreeOfAKind) {
+        private void assertFourOfAKind(Value expectedFourOfAKind, Hand handThatRanksAtFourOfAKind) {
             final Category expectedCategory = Category.FOUR_OF_A_KIND;
             String expectedOutput = RankEvaluation.HAND_HAS_REACHED + expectedCategory.toString()
                     + RankEvaluation.WITH_THE_QUAD + expectedFourOfAKind
                     + RankEvaluation.SENTENCE_END;
-            assertRank(expectedCategory, expectedOutput, handThatRanksAtThreeOfAKind);
+            assertRank(expectedCategory, expectedOutput, handThatRanksAtFourOfAKind);
+        }
+    }
+
+    @Nested
+    @DisplayName(WHEN_GIVEN_HAND_RANKS_AT_CATEGORY + "\"Full House\"")
+    class WhenGivenHandRanksAsFullHouse {
+
+        @Test
+        void Should_OutputRankWithFullHouse_ListingFullHouseWithTripletThenPair_WhenTripletIsHigherThanPair() {
+            Hand handThatRanksAtFullHouseWithTriadOfTenAndPairOfFour = new Hand(
+                    tenOfDiamonds, tenOfSpades, tenOfClubs,
+                    sixOfHearts, sixOfClubs);
+            assertFullHouse(Value.TEN, Value.SIX,
+                    handThatRanksAtFullHouseWithTriadOfTenAndPairOfFour);
+        }
+
+        @Test
+        void Should_OutputRankWithFullHouse_ListingFullHouseWithTripletThenPair_WhenTripletIsLowerThanPair() {
+            Hand handThatRanksAtFullHouseWithTriadOfSixAndPairOfTen = new Hand(
+                    tenOfDiamonds, sixOfDiamonds, tenOfClubs,
+                    sixOfHearts, sixOfClubs);
+            assertFullHouse(Value.SIX, Value.TEN,
+                    handThatRanksAtFullHouseWithTriadOfSixAndPairOfTen);
+        }
+
+        private void assertFullHouse(Value expectedTriad, Value expectedPair, Hand handThatRanksAtFullHouse) {
+            final Category expectedCategory = Category.FULL_HOUSE;
+            String expectedOutput = RankEvaluation.HAND_HAS_REACHED + expectedCategory.toString()
+                    + RankEvaluation.WITH_THE_TRIAD + expectedTriad
+                    + RankEvaluation.AND_THE_PAIR + expectedPair
+                    + RankEvaluation.SENTENCE_END;
+            assertRank(expectedCategory, expectedOutput, handThatRanksAtFullHouse);
         }
     }
 
