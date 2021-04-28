@@ -3,7 +3,7 @@ package poker;
 public enum Category {
     HIGH_CARD,
     PAIR,
-    TWO_PAIRS,
+    TWO_PAIR,
     THREE_OF_A_KIND,
     STRAIGHT,
     FLUSH,
