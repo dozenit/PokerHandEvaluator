@@ -10,15 +10,16 @@ public class RankEvaluation {
 
     private Set<Value> singles;
     private Set<Value> pairs;
+    private Set<Value> triads;
 
     private Value highCard;
-
     private Value pair;
+    private Value highPair;
+    private Value lowPair;
+    private Value threeOfAKind;
 
     private Value kicker;
 
-    private Value highPair;
-    private Value lowPair;
 
     //================================================================================
     // Static Strings for Output to User
@@ -34,6 +35,8 @@ public class RankEvaluation {
     public static final String WITH_A_HIGH_PAIR_OF = " with a high pair of ";
     public static final String A_LOW_PAIR_OF = ", a low pair of ";
 
+    public static final String WITH_THE_TRIAD = " with the triad ";
+
     public static final String SENTENCE_END = ".";
 
     //================================================================================
@@ -42,7 +45,7 @@ public class RankEvaluation {
 
     public RankEvaluation(Hand hand) {
         defineValueHistogram(hand);
-        defineSinglesAndPairs(valueHistogram);
+        defineSinglesAndPairsAndTriads(valueHistogram);
         evaluateCategoriesWithMultipleCardsOfOneValue(hand);
     }
 
@@ -53,6 +56,8 @@ public class RankEvaluation {
             evaluatePair(hand);
         } else if (pairs.size() == 2) {
             evaluateTwoPair(hand);
+        } else if (triads.size() == 1) {
+            evaluateThreeOfAKind(hand);
         }
     }
 
@@ -91,6 +96,15 @@ public class RankEvaluation {
         }
     }
 
+    // precondition: `pairs` has been set
+    private void evaluateThreeOfAKind(Hand hand) {
+        category = Category.THREE_OF_A_KIND;
+
+        for (Value theTriad : triads) {
+            threeOfAKind = theTriad;
+        }
+    }
+
     //================================================================================
     // Helper Methods for Rank Evaluation
     //================================================================================
@@ -110,9 +124,11 @@ public class RankEvaluation {
         }
     }
 
-    public void defineSinglesAndPairs(Map<Value, Integer> histogram) {
+    public void defineSinglesAndPairsAndTriads(Map<Value, Integer> histogram) {
         singles = new HashSet<>();
         pairs = new HashSet<>();
+        triads = new HashSet<>();
+
         for (Map.Entry<Value, Integer> entry : histogram.entrySet()) {
             int valueMultiplicity = entry.getValue();
             Value value = entry.getKey();
@@ -129,6 +145,10 @@ public class RankEvaluation {
                 case 2 -> {
                     pairs.add(value);
                     tempInfo += "the pairs.";
+                }
+                case 3 -> {
+                    triads.add(value);
+                    tempInfo += "the triads.";
                 }
             }
             System.out.println(tempInfo);
@@ -171,6 +191,7 @@ public class RankEvaluation {
             case PAIR -> rankInformation += WITH_A_PAIR_OF + pair + AND_THE_KICKER + kicker;
             case TWO_PAIR -> rankInformation += WITH_A_HIGH_PAIR_OF + highPair + A_LOW_PAIR_OF + lowPair
                     + AND_THE_KICKER + kicker;
+            case THREE_OF_A_KIND -> rankInformation += WITH_THE_TRIAD + threeOfAKind;
             default -> throw new IllegalArgumentException("Unable to determine category for given hand." +
                     "This method should not be called before `evaluateCategoriesWithMultipleCardsOfOneValue()` has initialized class attributes.");
         }
