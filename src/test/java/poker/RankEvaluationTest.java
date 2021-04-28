@@ -2,32 +2,30 @@ package poker;
 
 import org.junit.jupiter.api.*;
 
-import java.util.concurrent.ThreadPoolExecutor;
-
 @DisplayName("Rank evaluation and string checks.")
 public class RankEvaluationTest {
 
     public static final String WHEN_GIVEN_HAND_RANKS_AT_CATEGORY = "When given hand ranks at category ";
-    public static final String OUTPUT_SHOULD_RANK_THE_HAND_AS = "Output should rank the hand as ";
 
     Card twoOfClubs = new Card(Value.TWO, Suit.CLUBS);
     Card threeOfClubs = new Card(Value.THREE, Suit.CLUBS);
     Card fourOfClubs = new Card(Value.FOUR, Suit.CLUBS);
     Card fiveOfClubs = new Card(Value.FIVE, Suit.CLUBS);
     Card sixOfClubs = new Card(Value.SIX, Suit.CLUBS);
+    Card tenOfClubs = new Card(Value.TEN, Suit.CLUBS);
 
     Card fourOfDiamonds = new Card(Value.FOUR, Suit.DIAMONDS);
     Card fiveOfDiamonds = new Card(Value.FIVE, Suit.DIAMONDS);
     Card tenOfDiamonds = new Card(Value.TEN, Suit.DIAMONDS);
 
+    Card fourOfSpades = new Card(Value.FOUR, Suit.SPADES);
     Card tenOfSpades = new Card(Value.TEN, Suit.SPADES);
     Card jackOfSpades = new Card(Value.JACK, Suit.SPADES);
+
 
     @Nested
     @DisplayName(WHEN_GIVEN_HAND_RANKS_AT_CATEGORY + "\"High Card\"")
     class WhenGivenHandRanksAsHighCard {
-
-        public static final String HIGH_CARD_WITH_HIGH_CARD_OF = "high card, with high card of ";
 
         @Test
         void Should_OutputRank_ListingHighCard_WhenItsCardIsPassedAsLastParameterInHand() {
@@ -114,6 +112,37 @@ public class RankEvaluationTest {
                     + RankEvaluation.AND_THE_KICKER + expectedKicker
                     + RankEvaluation.SENTENCE_END;
             assertRank(expectedCategory, expectedOutput, handThatRanksAtTwoPair);
+        }
+    }
+
+    @Nested
+    @DisplayName(WHEN_GIVEN_HAND_RANKS_AT_CATEGORY + "\"Three of a Kind\"")
+    class WhenGivenHandRanksAsThreeOfAKind {
+
+        @Test
+        void Should_OutputRankWithTwoPair_ListingThreeOfAKind_WhenItContainsTheHighestValue() {
+            Hand handThatRanksAtThreeOfAKindWithTen = new Hand(
+                    tenOfDiamonds, tenOfSpades, tenOfClubs,
+                    fiveOfClubs, sixOfClubs);
+            assertThreeOfAKind(Value.TEN,
+                    handThatRanksAtThreeOfAKindWithTen);
+        }
+
+        @Test
+        void Should_OutputRankWithTwoPair_ListingThreeOfAKind_WhenItContainsTheLowestValue() {
+            Hand handThatRanksAtThreeOfAKindWithFour = new Hand(
+                    fourOfClubs, fourOfDiamonds, tenOfClubs,
+                    fiveOfClubs, fourOfSpades);
+            assertThreeOfAKind(Value.FOUR,
+                    handThatRanksAtThreeOfAKindWithFour);
+        }
+
+        private void assertThreeOfAKind(Value expectedThreeOfAKind, Hand handThatRanksAtThreeOfAKind) {
+            final Category expectedCategory = Category.THREE_OF_A_KIND;
+            String expectedOutput = RankEvaluation.HAND_HAS_REACHED + expectedCategory.toString()
+                    + RankEvaluation.WITH_THE_TRIAD + expectedThreeOfAKind
+                    + RankEvaluation.SENTENCE_END;
+            assertRank(expectedCategory, expectedOutput, handThatRanksAtThreeOfAKind);
         }
     }
 
