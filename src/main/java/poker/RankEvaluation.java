@@ -15,12 +15,13 @@ public class RankEvaluation {
 
     private Value highCard;
     private Value pair;
+    private Value kicker;
     private Value highPair;
     private Value lowPair;
     private Value threeOfAKind;
+    private Value pairOfFullHouse;
+    private Value triadOfFullHouse;
     private Value fourOfAKind;
-
-    private Value kicker;
 
 
     //================================================================================
@@ -29,8 +30,7 @@ public class RankEvaluation {
 
     public static final String HAND_HAS_REACHED = "Player's hand reached category ";
 
-    public static final String WITH_HIGH_CARD = " with the high card ";
-
+    public static final String WITH_THE_HIGH_CARD = " with the high card ";
     public static final String WITH_A_PAIR_OF = " with a pair of ";
     public static final String AND_THE_KICKER = " and the kicker ";
 
@@ -38,6 +38,7 @@ public class RankEvaluation {
     public static final String A_LOW_PAIR_OF = ", a low pair of ";
 
     public static final String WITH_THE_TRIAD = " with the triad ";
+    public static final String AND_THE_PAIR = " and the pair ";
     
     public static final String WITH_THE_QUAD = " with the quad ";
 
@@ -48,23 +49,34 @@ public class RankEvaluation {
     //================================================================================
 
     public RankEvaluation(Hand hand) {
-        defineValueHistogram(hand);
-        initializeClassAttributesForMultiples();
+        category = Category.HIGH_CARD;
+        populateValueHistogram(hand);
         populateClassAttributesForMultiples(valueHistogram);
 
         evaluateCategoriesWithMultipleCardsOfOneValue(hand);
     }
 
     private void evaluateCategoriesWithMultipleCardsOfOneValue(Hand hand) {
-        if (singles.size() == 5) {
+        final int singlesAmountOfAHandWithNoMultiples = 5;
+        final int pairsAmountOfAHandThatEitherHasThreeSinglesOrATriplet = 1;
+        final int triadsAmountOfAHandThatHasAPair = 1;
+        final int pairsAmountOfAHandThatHasOneSingle = 2;
+        final int triadsAmountOfAHandThatHasNoPairs = 1;
+        final int quadsAmountOfAHandThatHasOneSingle = 1;
+
+        if (singles.size() == singlesAmountOfAHandWithNoMultiples) {
             evaluateHighCard(hand);
-        } else if (pairs.size() == 1) {
-            evaluatePair(hand);
-        } else if (pairs.size() == 2) {
+        } else if (pairs.size() == pairsAmountOfAHandThatEitherHasThreeSinglesOrATriplet) {
+            if (triads.size() == triadsAmountOfAHandThatHasAPair) {
+                evaluateFullHouse(hand);
+            } else {
+                evaluatePair(hand);
+            }
+        } else if (pairs.size() == pairsAmountOfAHandThatHasOneSingle) {
             evaluateTwoPair(hand);
-        } else if (triads.size() == 1) {
+        } else if (triads.size() == triadsAmountOfAHandThatHasNoPairs) {
             evaluateThreeOfAKind(hand);
-        } else if (quads.size() == 1) {
+        } else if (quads.size() == quadsAmountOfAHandThatHasOneSingle) {
             evaluateFourOfAKind(hand);
         }
     }
@@ -113,6 +125,18 @@ public class RankEvaluation {
         }
     }
 
+    // precondition: `triads` and `quads` has been set
+    private void evaluateFullHouse(Hand hand) {
+        category = Category.FULL_HOUSE;
+
+        for (Value theTriad : triads) {
+            triadOfFullHouse = theTriad;
+        }
+        for (Value thePair : pairs) {
+            pairOfFullHouse = thePair;
+        }
+    }
+
     // precondition: `quads` has been set
     private void evaluateFourOfAKind(Hand hand) {
         category = Category.FOUR_OF_A_KIND;
@@ -126,7 +150,7 @@ public class RankEvaluation {
     // Helper Methods for Rank Evaluation
     //================================================================================
 
-    public void defineValueHistogram(Hand hand) {
+    public void populateValueHistogram(Hand hand) {
         valueHistogram = new HashMap<>();
         int multiplicity;
         for (Card card: hand.getCards()) {
@@ -149,6 +173,7 @@ public class RankEvaluation {
     }
 
     private void populateClassAttributesForMultiples(Map<Value, Integer> histogram) {
+        initializeClassAttributesForMultiples();
         for (Map.Entry<Value, Integer> entry : histogram.entrySet()) {
             int valueMultiplicity = entry.getValue();
             Value value = entry.getKey();
@@ -211,11 +236,12 @@ public class RankEvaluation {
         String rankInformation = HAND_HAS_REACHED + category.toString();
 
         switch (this.category) {
-            case HIGH_CARD -> rankInformation += WITH_HIGH_CARD + highCard;
+            case HIGH_CARD -> rankInformation += WITH_THE_HIGH_CARD + highCard;
             case PAIR -> rankInformation += WITH_A_PAIR_OF + pair + AND_THE_KICKER + kicker;
             case TWO_PAIR -> rankInformation += WITH_A_HIGH_PAIR_OF + highPair + A_LOW_PAIR_OF + lowPair
                     + AND_THE_KICKER + kicker;
             case THREE_OF_A_KIND -> rankInformation += WITH_THE_TRIAD + threeOfAKind;
+            case FULL_HOUSE -> rankInformation += WITH_THE_TRIAD + triadOfFullHouse + AND_THE_PAIR + pairOfFullHouse;
             case FOUR_OF_A_KIND -> rankInformation += WITH_THE_QUAD + fourOfAKind;
             default -> throw new IllegalArgumentException("Unable to determine category for given hand." +
                     "This method should not be called before `evaluateCategoriesWithMultipleCardsOfOneValue()` has initialized class attributes.");
